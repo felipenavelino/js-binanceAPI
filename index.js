@@ -1,10 +1,28 @@
 const express = require("express");
 const WebSocket = require("ws");
 const axios = require("axios");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 require("dotenv").config();
 
 const app = express();
 const port = 3000;
+const User = require('./models/User');
+
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static("public"));
+
+// MongoDB Connection
+mongoose.connect('mongodb://localhost/crypto_dashboard', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 const symbols = process.env.SYMBOLS?.trim().split(',') || [];
 const priceHistories = {
@@ -117,8 +135,165 @@ app.get("/api/prices", async (req, res) => {
     }
 });
 
-app.use(express.static("public"));
+// Authentication Routes
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        // Check if user exists
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'User already exists'
+            });
+        }
+
+        // Create new user
+        const user = await User.create({
+            username,
+            email,
+            password
+        });
+
+        // Generate token
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        // Send token in cookie
+        res.cookie('jwt', token, {
+            expires: new Date(
+                Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+            ),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production'
+        });
+
+        // Remove password from output
+        user.password = undefined;
+
+        res.status(201).json({
+            status: 'success',
+            token,
+            data: { user }
+        });
+    } catch (error) {
+        res.status(400).json({
+            status: 'error',
+            message: error.message
+        });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check if email and password exist
+        if (!email || !password) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Please provide email and password'
+            });
+        }
+
+        // Check if user exists and password is correct
+        const user = await User.findOne({ email }).select('+password');
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Incorrect email or password'
+            });
+        }
+
+        // Generate token
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        // Send token in cookie
+        res.cookie('jwt', token, {
+            expires: new Date(
+                Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+            ),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production'
+        });
+
+        // Remove password from output
+        user.password = undefined;
+
+        res.status(200).json({
+            status: 'success',
+            token,
+            data: { user }
+        });
+    } catch (error) {
+        res.status(400).json({
+            status: 'error',
+            message: error.message
+        });
+    }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+    res.status(200).json({ status: 'success' });
+});
+
+// Protect route middleware
+const protect = async (req, res, next) => {
+    try {
+        let token;
+        
+        if (req.cookies.jwt) {
+            token = req.cookies.jwt;
+        }
+
+        if (!token) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'You are not logged in'
+            });
+        }
+
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Check if user still exists
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'User no longer exists'
+            });
+        }
+
+        // Grant access to protected route
+        req.user = user;
+        next();
+    } catch (err) {
+        res.status(401).json({
+            status: 'error',
+            message: 'Invalid token'
+        });
+    }
+};
+
+// Protected routes example
+app.get('/api/prices', protect, async (req, res) => {
+    // Your existing price fetching logic
+    // ... existing code ...
+});
 
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
