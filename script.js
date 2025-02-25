@@ -4,12 +4,50 @@ document.addEventListener("DOMContentLoaded", () => {
     createChartForSymbol('XRPUSDT', 'xrpChart', 'xrpTimeFilter', 'rgb(0, 0, 0)');      // XRP black
     checkLoginStatus();
     
+    // Login form handler
+    const loginForm = document.querySelector('#login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.querySelector('#login-email').value;
+            const password = document.querySelector('#login-password').value;
+            
+            try {
+                const data = await login(email, password);
+                document.getElementById('login-modal').classList.add('hidden');
+                // Update UI for logged-in state
+            } catch (error) {
+                // Handle error (show message to user)
+            }
+        });
+    }
+
+    // Register form handler
+    const registerForm = document.querySelector('#signup-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.querySelector('#name').value;
+            const email = document.querySelector('#email').value;
+            const password = document.querySelector('#password').value;
+            
+            try {
+                const data = await register(username, email, password);
+                document.getElementById('signup-modal').classList.add('hidden');
+                // Update UI for logged-in state
+            } catch (error) {
+                // Handle error (show message to user)
+            }
+        });
+    }
 });
 
 
 
 async function fetchData(timeFilter, symbol) {
-    const response = await fetch(`/api/prices?filter=${timeFilter}&symbol=${symbol}`);
+    const response = await fetch(`/api/prices?filter=${timeFilter}&symbol=${symbol}`, {
+        credentials: 'include'
+    });
     const data = await response.json();
     
     return {
@@ -187,5 +225,73 @@ async function createChartForSymbol(symbol, elementId, filterId, color) {
     });
 
     return chart;
+}
+
+async function register(username, email, password) {
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, email, password }),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Registration failed');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Registration error:', error);
+        throw error;
+    }
+}
+
+async function login(email, password) {
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error;
+    }
+}
+
+async function logout() {
+    try {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Logout failed');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Logout error:', error);
+        throw error;
+    }
 }
 
