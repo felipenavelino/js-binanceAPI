@@ -152,8 +152,6 @@ async function createChartForSymbol(symbol, elementId, filterId, color) {
     let chart = null;
 
     async function updateChart(timeFilter) {
-        console.log(`Updating chart for ${symbol} with filter ${timeFilter}`); // Debug log
-        
         const ctx = document.getElementById(elementId).getContext("2d");
         const chartContainer = ctx.canvas.parentElement;
         chartContainer.classList.add('opacity-50');
@@ -169,10 +167,16 @@ async function createChartForSymbol(symbol, elementId, filterId, color) {
                         label: `${symbol} Price`,
                         data: prices,
                         borderColor: color,
-                        borderWidth: 1.5,
-                        fill: false,
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: `${color}15`,
                         pointRadius: 0,
-                        tension: 0.1
+                        pointHitRadius: 0,
+                        pointHoverRadius: 0,
+                        tension: 0.4,
+                        // Desabilitar completamente os pontos
+                        showLine: true,
+                        pointStyle: false,
                     }]
                 },
                 options: {
@@ -184,69 +188,76 @@ async function createChartForSymbol(symbol, elementId, filterId, color) {
                     },
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                color: 'rgb(160, 160, 160)',
-                                font: {
-                                    size: 12
-                                }
-                            }
+                            display: false
                         },
                         tooltip: {
+                            enabled: true,
                             mode: 'index',
                             intersect: false,
-                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                            titleColor: 'rgb(160, 160, 160)',
-                            bodyColor: 'white',
-                            borderColor: 'rgb(60, 60, 60)',
-                            borderWidth: 1
+                            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                            titleColor: 'rgba(255, 255, 255, 0.9)',
+                            bodyColor: 'rgba(255, 255, 255, 0.9)',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.parsed.y.toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}`;
+                                }
+                            }
+                        }
+                    },
+                    hover: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    elements: {
+                        point: {
+                            radius: 0,
+                            hoverRadius: 0,
+                            hitRadius: 0
+                        },
+                        line: {
+                            tension: 0.4
                         }
                     },
                     scales: {
                         x: {
-                            grid: {
-                                color: 'rgba(60, 60, 60, 0.2)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                color: 'rgb(160, 160, 160)',
-                                font: {
-                                    size: 11
-                                },
-                                maxRotation: 0
-                            }
+                            display: false
                         },
                         y: {
                             position: 'right',
                             grid: {
-                                color: 'rgba(60, 60, 60, 0.2)',
-                                drawBorder: false
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            border: {
+                                display: false
                             },
                             ticks: {
-                                color: 'rgb(160, 160, 160)',
+                                color: 'rgba(255, 255, 255, 0.5)',
                                 font: {
-                                    size: 11
+                                    size: 12
                                 },
                                 callback: function(value) {
-                                    return '$' + value.toLocaleString();
+                                    return '$' + value.toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
                                 }
                             }
                         }
-                    },
-                    animation: {
-                        duration: 750,
-                        easing: 'easeInOutQuart'
                     }
                 }
             };
 
             if (chart) {
-                // Destroy existing chart before creating a new one
                 chart.destroy();
             }
             
-            // Create new chart
             chart = new Chart(ctx, chartConfig);
 
         } catch (error) {
@@ -256,19 +267,13 @@ async function createChartForSymbol(symbol, elementId, filterId, color) {
         }
     }
 
-    // Adiciona o event listener para o seletor de tempo
     const timeFilterElement = document.getElementById(filterId);
     if (timeFilterElement) {
         timeFilterElement.addEventListener('change', (event) => {
-            console.log(`Time filter changed to ${event.target.value}`); // Debug log
             updateChart(event.target.value);
         });
 
-        // Inicializa o gráfico com o valor padrão do seletor
-        const initialTimeFilter = timeFilterElement.value;
-        await updateChart(initialTimeFilter);
-    } else {
-        console.error(`Element with id ${filterId} not found`);
+        await updateChart(timeFilterElement.value);
     }
 
     return chart;
@@ -340,4 +345,25 @@ async function logout() {
         console.error('Logout error:', error);
         throw error;
     }
+}
+
+// Funções para controlar os modais
+function showLoginModal() {
+    document.getElementById('signup-modal').classList.add('hidden');
+    document.getElementById('login-modal').classList.remove('hidden');
+}
+
+function showSignupModal() {
+    document.getElementById('login-modal').classList.add('hidden');
+    document.getElementById('signup-modal').classList.remove('hidden');
+}
+
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const type = input.type === 'password' ? 'text' : 'password';
+    input.type = type;
+    
+    // Atualiza o ícone
+    const icon = input.nextElementSibling.querySelector('i');
+    icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
 }
