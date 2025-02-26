@@ -1,6 +1,14 @@
 <html>
 <head>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+        style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+        font-src 'self' https://cdnjs.cloudflare.com;
+        img-src 'self' data: https://storage.googleapis.com;
+    ">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
 </head>
 <body class="bg-gray-900 text-white">
@@ -97,40 +105,84 @@
     </div>
 
     <div class="flex flex-col gap-8 p-4">
-        <div class="w-full">
-            <div class="flex items-center gap-4 mb-4">
-                <h2 class="text-xl font-bold text-white">Bitcoin (BTC)</h2>
-                <select id="btcTimeFilter" class="bg-gray-800 text-white px-4 py-2 rounded">
-                    <option value="24h">Últimas 24 horas</option>
-                    <option value="7d">Últimos 7 dias</option>
-                    <option value="30d">Últimos 30 dias</option>
-                </select>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Bitcoin Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: rgb(247, 147, 26)">
+                            <i class="fab fa-bitcoin text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Bitcoin</h2>
+                            <span class="text-gray-400 text-sm">BTC/USDT</span>
+                        </div>
+                    </div>
+                    <select id="btcTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                    </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="btcChart"></canvas>
+                </div>
             </div>
-            <canvas id="btcChart" width="50" height="50" ></canvas>
-        </div>
-        
-        <div class="w-full">
-            <div class="flex items-center gap-4 mb-4">
-                <h2 class="text-xl font-bold text-white">Ethereum (ETH)</h2>
-                <select id="ethTimeFilter" class="bg-gray-800 text-white px-4 py-2 rounded">
-                    <option value="24h">Últimas 24 horas</option>
-                    <option value="7d">Últimos 7 dias</option>
-                    <option value="30d">Últimos 30 dias</option>
-                </select>
+
+            <!-- Ethereum Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: rgb(98, 126, 234)">
+                            <i class="fab fa-ethereum text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Ethereum</h2>
+                            <span class="text-gray-400 text-sm">ETH/USDT</span>
+                        </div>
+                    </div>
+                    <select id="ethTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                    </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="ethChart"></canvas>
+                </div>
             </div>
-            <canvas id="ethChart" width="100" height="100" ></canvas>
-        </div>
-        
-        <div class="w-full">
-            <div class="flex items-center gap-4 mb-4">
-                <h2 class="text-xl font-bold text-white">Ripple (XRP)</h2>
-                <select id="xrpTimeFilter" class="bg-gray-800 text-white px-4 py-2 rounded">
-                    <option value="24h">Últimas 24 horas</option>
-                    <option value="7d">Últimos 7 dias</option>
-                    <option value="30d">Últimos 30 dias</option>
-                </select>
+
+            <!-- XRP Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-500">
+                            <span class="text-white font-bold">XRP</span>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Ripple</h2>
+                            <span class="text-gray-400 text-sm">XRP/USDT</span>
+                        </div>
+                    </div>
+                    <select id="xrpTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                     </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="xrpChart"></canvas>
+                </div>
             </div>
-            <canvas id="xrpChart" width="50" height="50" class="max-w-1x1"></canvas>
         </div>
     </div>
 
