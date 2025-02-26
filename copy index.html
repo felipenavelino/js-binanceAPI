@@ -43,113 +43,260 @@
     </div>
     -->
 
-    <!-- Sign Up Modal -->
-    <div id="signup-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-            <form>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2" for="name">Name</label>
-                    <input class="bg-gray-700 text-white rounded-lg w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="name" type="text" placeholder="Enter your name"/>
+    <!-- Modal de Login - Movido para fora do container principal -->
+    <div id="login-modal" class="hidden fixed inset-0 z-50">
+        <!-- Overlay de fundo escuro -->
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        
+        <!-- Container do Modal -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                    w-full max-w-md bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
+            <div class="p-6">
+                <!-- Cabeçalho do Modal -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-100">Log In</h2>
+                    <button onclick="document.getElementById('login-modal').classList.add('hidden')"
+                            class="text-gray-400 hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2" for="email">Email</label>
-                    <input class="bg-gray-700 text-white rounded-lg w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="email" type="email" placeholder="Enter your email"/>
-                </div>
-                <div class="mb-4 relative">
-                    <label class="block text-sm font-medium mb-2" for="password">Password</label>
-                    <input class="bg-gray-700 text-white rounded-lg w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="password" type="password" placeholder="Enter your password"/>
-                    <i class="fas fa-eye absolute right-3 top-3/4 transform -translate-y-1/2 text-gray-500 cursor-pointer" onclick="togglePasswordVisibility('password')"></i>
-                </div>
-                <div class="mb-6 relative">
-                    <label class="block text-sm font-medium mb-2" for="confirm_password">Confirm Password</label>
-                    <input class="bg-gray-700 text-white rounded-lg w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="confirm_password" type="password" placeholder="Confirm your password"/>
-                    <i class="fas fa-eye absolute right-3 top-3/4 transform -translate-y-1/2 text-gray-500 cursor-pointer" onclick="togglePasswordVisibility('confirm_password')"></i>
-                </div>
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg w-full" type="submit">Sign Up</button>
-            </form>
-            <p class="mt-4 text-center text-sm">Already have an account? <a class="text-blue-500 hover:underline" href="#" onclick="document.getElementById('signup-modal').classList.add('hidden'); document.getElementById('login-modal').classList.remove('hidden')">Log In</a></p>
-            <button class="mt-4 text-center text-sm text-blue-500 hover:underline w-full" onclick="document.getElementById('signup-modal').classList.add('hidden')">Close</button>
-        </div>
-    </div>
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6 text-center">Log In</h2>
-            <form>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2" for="email">Email</label>
-                    <input class="bg-gray-700 text-white rounded-lg w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="email" type="email" placeholder="Enter your email"/>
-                </div>
-                <div class="mb-6 relative">
-                    <label class="block text-sm font-medium mb-2" for="password">Password</label>
-                    <input class="bg-gray-700 text-white rounded-lg w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" id="login_password" type="password" placeholder="Enter your password"/>
-                    <i class="fas fa-eye absolute right-3 top-3/4 transform -translate-y-1/2 text-gray-500 cursor-pointer" onclick="togglePasswordVisibility('login_password')"></i>
-                </div>
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center">
-                        <input class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" id="remember_me" type="checkbox"/>
-                        <label class="ml-2 block text-sm" for="remember_me">Remember me</label>
+                <!-- Formulário de Login -->
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input type="email" 
+                               id="login-email" 
+                               class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg 
+                                      text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                                      focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter your email">
                     </div>
-                    <a class="text-sm text-blue-500 hover:underline" href="#">Forgot password?</a>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <div class="relative">
+                            <input type="password" 
+                                   id="login-password" 
+                                   class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg 
+                                          text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                                          focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Enter your password">
+                            <button type="button" 
+                                    onclick="togglePasswordVisibility('login-password')"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 
+                                           hover:text-gray-200 focus:outline-none">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" 
+                            class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium 
+                                   rounded-lg transition-colors duration-200">
+                        Log In
+                    </button>
+                </form>
+
+                <!-- Links adicionais -->
+                <div class="mt-4 text-center text-sm">
+                    <p class="text-gray-400">
+                        Don't have an account? 
+                        <a href="#" onclick="showSignupModal()" class="text-blue-500 hover:text-blue-400">Sign up</a>
+                    </p>
                 </div>
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg w-full" type="submit">Log In</button>
-            </form>
-            <p class="mt-4 text-center text-sm">Don't have an account? <a class="text-blue-500 hover:underline" href="#" onclick="document.getElementById('login-modal').classList.add('hidden'); document.getElementById('signup-modal').classList.remove('hidden')">Sign Up</a></p>
-            <button class="mt-4 text-center text-sm text-blue-500 hover:underline w-full" onclick="document.getElementById('login-modal').classList.add('hidden')">Close</button>
+            </div>
         </div>
     </div>
 
-    <div class="flex flex-col gap-8 p-4">
-        <!-- Bitcoin Chart -->
-        <div class="w-full bg-slate-900 p-4 rounded-lg shadow-lg chart-container">
-            <div class="flex items-center gap-4 mb-4">
-                <h2 class="text-xl font-bold text-gray-300">Bitcoin (BTC)</h2>
-                <select id="btcTimeFilter" class="bg-slate-800 text-gray-300 px-4 py-2 rounded border border-slate-700">
-                    <option value="1d">1D</option>
-                    <option value="1w">1W</option>
-                    <option value="1m">1M</option>
-                    <option value="6m">6M</option>
-                    <option value="1y">1Y</option>
-                </select>
-            </div>
-            <div class="h-[400px]">
-                <canvas id="btcChart"></canvas>
+    <!-- Modal de Signup (similar ao login) -->
+    <div id="signup-modal" class="hidden fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                    w-full max-w-md bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-100">Sign Up</h2>
+                    <button onclick="document.getElementById('signup-modal').classList.add('hidden')"
+                            class="text-gray-400 hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="signup-form" class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                        <input type="text" 
+                               id="name" 
+                               class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg 
+                                      text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                                      focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter your name">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input type="email" 
+                               id="email" 
+                               class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg 
+                                      text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                                      focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter your email">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <div class="relative">
+                            <input type="password" 
+                                   id="password" 
+                                   class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg 
+                                          text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                                          focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Enter your password">
+                            <button type="button" 
+                                    onclick="togglePasswordVisibility('password')"
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 
+                                           hover:text-gray-200 focus:outline-none">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" 
+                            class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium 
+                                   rounded-lg transition-colors duration-200">
+                        Sign Up
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center text-sm">
+                    <p class="text-gray-400">
+                        Already have an account? 
+                        <a href="#" onclick="showLoginModal()" class="text-blue-500 hover:text-blue-400">Log in</a>
+                    </p>
+                </div>
             </div>
         </div>
-        
-        <!-- Ethereum Chart -->
-        <div class="w-full bg-slate-900 p-4 rounded-lg shadow-lg chart-container">
-            <div class="flex items-center gap-4 mb-4">
-                <h2 class="text-xl font-bold text-gray-300">Ethereum (ETH)</h2>
-                <select id="ethTimeFilter" class="bg-slate-800 text-gray-300 px-4 py-2 rounded border border-slate-700">
-                    <option value="1d">1D</option>
-                    <option value="1w">1W</option>
-                    <option value="1m">1M</option>
-                    <option value="6m">6M</option>
-                    <option value="1y">1Y</option>
-                </select>
-            </div>
-            <div class="h-[400px]">
-                <canvas id="ethChart"></canvas>
-            </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Market Overview Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-100 mb-2">Market Overview</h1>
+            <p class="text-gray-400">Real-time cryptocurrency market data and charts</p>
         </div>
-        
-        <!-- Ripple Chart -->
-        <div class="w-full bg-slate-900 p-4 rounded-lg shadow-lg chart-container">
-            <div class="flex items-center gap-4 mb-4">
-                <h2 class="text-xl font-bold text-gray-300">Ripple (XRP)</h2>
-                <select id="xrpTimeFilter" class="bg-slate-800 text-gray-300 px-4 py-2 rounded border border-slate-700">
-                    <option value="1d">1D</option>
-                    <option value="1w">1W</option>
-                    <option value="1m">1M</option>
-                    <option value="6m">6M</option>
-                    <option value="1y">1Y</option>
-                </select>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Bitcoin Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: rgb(247, 147, 26)">
+                            <i class="fab fa-bitcoin text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Bitcoin</h2>
+                            <span class="text-gray-400 text-sm">BTC/USDT</span>
+                        </div>
+                    </div>
+                    <select id="btcTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                        <option value="6m">6M</option>
+                        <option value="1y">1Y</option>
+                    </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="btcChart"></canvas>
+                </div>
             </div>
-            <div class="h-[400px]">
-                <canvas id="xrpChart"></canvas>
+
+            <!-- Ethereum Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: rgb(98, 126, 234)">
+                            <i class="fab fa-ethereum text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Ethereum</h2>
+                            <span class="text-gray-400 text-sm">ETH/USDT</span>
+                        </div>
+                    </div>
+                    <select id="ethTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                        <option value="6m">6M</option>
+                        <option value="1y">1Y</option>
+                    </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="ethChart"></canvas>
+                </div>
+            </div>
+
+            <!-- XRP Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-black">
+                            <span class="text-white font-bold text-sm">XRP</span>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Ripple</h2>
+                            <span class="text-gray-400 text-sm">XRP/USDT</span>
+                        </div>
+                    </div>
+                    <select id="xrpTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                        <option value="6m">6M</option>
+                        <option value="1y">1Y</option>
+                    </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="xrpChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Solana Chart -->
+            <div class="bg-[#0D1117] rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: rgb(20, 241, 149)">
+                            <svg class="w-4 h-4" viewBox="0 0 397.7 311.7" fill="black">
+                                <path d="M64.6,237.9c2.4-2.4,5.7-3.8,9.2-3.8h317.4c5.8,0,8.7,7,4.6,11.1l-62.7,62.7c-2.4,2.4-5.7,3.8-9.2,3.8H6.5c-5.8,0-8.7-7-4.6-11.1L64.6,237.9z"/>
+                                <path d="M64.6,3.8C67.1,1.4,70.4,0,73.8,0h317.4c5.8,0,8.7,7,4.6,11.1l-62.7,62.7c-2.4,2.4-5.7,3.8-9.2,3.8H6.5c-5.8,0-8.7-7-4.6-11.1L64.6,3.8z"/>
+                                <path d="M333.1,120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8,0-8.7,7-4.6,11.1l62.7,62.7c2.4,2.4,5.7,3.8,9.2,3.8h317.4c5.8,0,8.7-7,4.6-11.1L333.1,120.1z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-white text-lg font-semibold">Solana</h2>
+                            <span class="text-gray-400 text-sm">SOL/USDT</span>
+                        </div>
+                    </div>
+                    <select id="solTimeFilter" 
+                            class="bg-[#161B22] text-gray-300 px-3 py-1.5 rounded border border-gray-700 
+                                   focus:outline-none focus:ring-1 focus:ring-gray-500
+                                   text-sm">
+                        <option value="24h">24H</option>
+                        <option value="7d">7D</option>
+                        <option value="30d">30D</option>
+                        <option value="6m">6M</option>
+                        <option value="1y">1Y</option>
+                    </select>
+                </div>
+                <div class="h-[300px] relative">
+                    <canvas id="solChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
