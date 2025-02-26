@@ -9,11 +9,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.querySelector('#login-email').value;
-            const password = document.querySelector('#login-password').value;
             
             try {
-                const data = await login(email, password);
+                const email = document.querySelector('#login-email').value;
+                const password = document.querySelector('#login-password').value;
+                
+                console.log('Attempting login with:', { email }); // Log para debug
+                
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Login failed');
+                }
+
+                console.log('Login successful:', data); // Log para debug
+                
+                // Esconder modal de login
                 document.getElementById('login-modal').classList.add('hidden');
                 // Update UI for logged-in state
             } catch (error) {
@@ -42,7 +62,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
+async function checkLoginStatus() {
+    try {
+        const response = await fetch('/api/auth/check', {
+            credentials: 'include'
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.user) {
+                updateUIForLoggedInUser(data.user);
+            }
+        }
+    } catch (error) {
+        console.error('Failed to check login status:', error);
+    }
+}
 
 async function fetchData(timeFilter, symbol) {
     const response = await fetch(`/api/prices?filter=${timeFilter}&symbol=${symbol}`, {
@@ -170,45 +205,55 @@ async function createChartForSymbol(symbol, elementId, filterId, color) {
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            aspectRatio: 2.5,
             plugins: {
                 legend: {
-                    position: 'top',
-                    align: 'start',
-                    labels: {
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        },
-                        padding: 20,
-                        color: 'white'
-                    }
+                    display: false  // Remove a legenda já que temos o título acima
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: color,
+                    borderWidth: 1
                 }
             },
             scales: {
                 x: {
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        drawBorder: false
                     },
                     ticks: {
-                        color: 'white',
+                        color: 'rgba(255, 255, 255, 0.7)',
                         font: {
-                            size: 12
+                            size: 11
                         },
                         maxRotation: 45,
-                        maxTicksLimit: timeFilter === "24h" ? 12 : 10
+                        maxTicksLimit: timeFilter === "24h" ? 8 : 7
                     }
                 },
                 y: {
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        drawBorder: false
                     },
                     ticks: {
-                        color: 'white',
+                        color: 'rgba(255, 255, 255, 0.7)',
                         font: {
-                            size: 12
+                            size: 11
+                        },
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
                         }
                     }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
