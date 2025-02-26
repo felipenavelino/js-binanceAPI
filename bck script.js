@@ -47,26 +47,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 async function fetchData(timeFilter, symbol) {
-    console.log(`Fetching data for ${symbol} with filter ${timeFilter}`); // Debug log
-
     try {
-        const response = await fetch(`/api/prices?filter=${timeFilter}&symbol=${symbol}`);
+        console.log(`Fetching data for ${symbol} with filter ${timeFilter}`); // Debug log
+        
+        const response = await fetch(`/api/prices?filter=${timeFilter}&symbol=${symbol}`, {
+            credentials: 'include'
+        });
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
-        
         console.log(`Received ${data.length} data points for ${symbol}`); // Debug log
-        
+
         return {
-            labels: data.map(entry => new Date(entry.timestamp).toLocaleDateString()),
-            prices: data.map(entry => entry.price)
+            labels: data.map(entry => {
+                const date = new Date(entry.timestamp);
+                switch(timeFilter) {
+                    case "24h":
+                        return date.toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            hour12: false 
+                        });
+                    case "7d":
+                    case "30d":
+                        return date.toLocaleDateString([], { 
+                            month: 'short', 
+                            day: 'numeric' 
+                        });
+                    case "6m":
+                    case "1y":
+                        return date.toLocaleDateString([], { 
+                            month: 'short', 
+                            year: 'numeric' 
+                        });
+                    default:
+                        return date.toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            hour12: false 
+                        });
+                }
+            }),
+            prices: data.map(entry => parseFloat(entry.price))
         };
     } catch (error) {
         console.error('Error fetching data:', error);
         return { labels: [], prices: [] };
     }
 }
+
+// Atualizar o HTML dos selects para ter os mesmos valores
 
 
 async function updateChart(chart, timeFilter, symbol) {
